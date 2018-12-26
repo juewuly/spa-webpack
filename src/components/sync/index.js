@@ -1,8 +1,15 @@
 import {isArray} from "lodash-es";
 import item from "./sync.css";
+import help from "../common/help.js";
+console.log("async引用", help.version);
 const sync = function() {
     console.log("sync");
-    document.getElementById("app").innerHTML = `<h1 class="${item.test}">Hello</h1>`;
+    fetch("/api/test")
+    .then(response => response.json())
+    .then(data => {
+        console.log("fetch结果", data.message);
+    })
+    // document.getElementById("app").innerHTML = `<h1 class="${item.test}">Hello</h1>`;
 }
 
 const isArrayFun = function(args) {
