@@ -6,12 +6,22 @@ const _mode = argv.mode || "development";
 const _modeflag = (_mode == "production" ? true : false);
 const _mergeConfig = require(`./config/webpack.${_mode}.js`);
 const CleanWebpackPlugin = require('clean-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin')
-
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
+const WebpackBuildNotifierPlugin = require('webpack-build-notifier');
+const ProgressBarPlugin = require('progress-bar-webpack-plugin');
+const smp = new SpeedMeasurePlugin();
+const ManifestPlugin = require('webpack-manifest-plugin');
+// const DashboardPlugin = require('webpack-dashboard/plugin');
+// const setTitle = require('node-bash-title');
+// setTitle('测试webpack。。。');
 const { join } = require("path");
 const PurifyCSSPlugin = require('purifycss-webpack');
 const glob = require("glob");
-console.log("寻找文件", glob.sync(join(__dirname, './dist/*.html')));
+const loading = {
+    html: "加载中"
+};
+// console.log("寻找文件", glob.sync(join(__dirname, './dist/*.html')));
 webpackConfig = {
     module: {
         rules: [
@@ -60,6 +70,14 @@ webpackConfig = {
         }
     },
     plugins: [
+        // new DashboardPlugin(),
+        new ManifestPlugin(),
+        new ProgressBarPlugin(),
+        new WebpackBuildNotifierPlugin({
+            title: "My Project Webpack Build",
+            // logo: path.resolve("./img/favicon.png"),
+            suppressSuccess: true
+        }),
         new WebpackDeepScopeAnalysisPlugin(),
         new MiniCssExtractPlugin({
             // Options similar to the same options in webpackOptions.output
@@ -69,7 +87,8 @@ webpackConfig = {
           }),
         new HtmlWebpackPlugin({
             filename: "index.html",
-            template: "src/index.html"
+            template: "src/index.html",
+            loading
         }),
         new CleanWebpackPlugin(['dist']),
         // new PurifyCSSPlugin({
@@ -79,4 +98,5 @@ webpackConfig = {
     ]
 };
 
+// module.exports = smp.wrap(merge(_mergeConfig, webpackConfig));
 module.exports = merge(_mergeConfig, webpackConfig);
